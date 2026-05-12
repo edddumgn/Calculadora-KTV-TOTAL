@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora KTV</title>
+    <title>Calculadora de KTV - Nefroclínicas</title>
     <style>
         * {
             margin: 0;
@@ -12,7 +12,7 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a5276, #2874a6);
+            background: linear-gradient(135deg, #e8f4f8, #f0f7fa);
             min-height: 100vh;
             padding: 20px;
         }
@@ -20,15 +20,20 @@
             max-width: 800px;
             margin: 0 auto;
         }
+        .logo {
+            max-width: 250px;
+            display: block;
+            margin: 0 auto 10px;
+        }
         h1 {
             text-align: center;
-            color: white;
+            color: #1a5276;
             margin-bottom: 5px;
             font-size: 28px;
         }
         .subtitle {
             text-align: center;
-            color: #aed6f1;
+            color: #2874a6;
             margin-bottom: 20px;
             font-size: 14px;
         }
@@ -226,12 +231,15 @@
             .result-grid {
                 grid-template-columns: 1fr;
             }
+            .logo {
+                max-width: 180px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="logo.png" alt="Nefroclínicas" style="max-width: 200px; display: block; margin: 0 auto 10px;">
+        <img src="logo.png" alt="Nefroclínicas" class="logo">
         <h1>Calculadora de KTV - Nefroclínicas</h1>
         <p class="subtitle">Cálculo de Kt/V para Diálise Peritoneal</p>
 
