@@ -1,4 +1,4 @@
-CALCULADORA KTV v1.0
+CALCULADORA KTV v1.2
 =====================
 
 Como usar:
