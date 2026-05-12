@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora KTV</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a5276, #2874a6);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #aed6f1;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a5276;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2874a6;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        input, select {
+            padding: 10px;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2874a6;
+        }
+        input[type="number"] {
+            text-align: right;
+        }
+        .formula-info {
+            background: #eaf2f8;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #1a5276;
+        }
+        .formula-info strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .btn-calculate {
+            background: #27ae60;
+            color: white;
+        }
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-print {
+            background: #3498db;
+            color: white;
+        }
+        .results {
+            display: none;
+        }
+        .results.show {
+            display: block;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .result-card {
+            background: linear-gradient(135deg, #2874a6, #1a5276);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .result-card.highlight {
+            background: linear-gradient(135deg, #27ae60, #1e8449);
+            grid-column: 1 / -1;
+        }
+        .result-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        .result-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .result-card.highlight .result-value {
+            font-size: 36px;
+        }
+        .warning {
+            background: #f39c12;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+        .warning.show {
+            display: block;
+        }
+        .header-info {
+            background: white;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header-info .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .header-info label {
+            font-size: 12px;
+        }
+        @media print {
+            body {
+                background: white;
+                padding: 10px;
+            }
+            .btn-container {
+                display: none;
+            }
+            .section {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+        }
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora KTV</h1>
+        <p class="subtitle">Cálculo de Kt/V para Diálise Peritoneal</p>
+
+        <div class="header-info">
+            <div class="form-group" style="flex: 2;">
+                <label for="nomePaciente">Nome do Paciente</label>
+                <input type="text" id="nomePaciente" placeholder="Digite o nome do paciente">
+            </div>
+            <div class="form-group">
+                <label for="dataExame">Data do Exame</label>
+                <input type="date" id="dataExame">
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Dados do Paciente</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="sexo">Sexo *</label>
+                    <select id="sexo">
+                        <option value="F">Feminino</option>
+                        <option value="M">Masculino</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="peso">Peso (kg) *</label>
+                    <input type="number" id="peso" step="0.1" placeholder="Ex: 58">
+                </div>
+                <div class="form-group">
+                    <label for="altura">Altura (cm) *</label>
+                    <input type="number" id="altura" step="1" placeholder="Ex: 154">
+                </div>
+                <div class="form-group">
+                    <label for="idade">Idade (anos) *</label>
+                    <input type="number" id="idade" step="1" placeholder="Ex: 71">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Dados do Dialisato</div>
+            <div class="formula-info">
+                <strong>Legenda:</strong> * = obrigatório | △ = preencher juntos<br><br>
+                <strong>Volume Dialisato:</strong> (Volume Infusão × Nº Ciclos) + UF<br>
+                * Se já tiver o Volume Total, preencha apenas o campo "Volume Total Dialisato (L)"<br><br>
+                <strong>Fórmula de Watson (Volume Corporal):</strong><br>
+                Mulher: (0.1069 × altura) + (0.2466 × peso) - 2.097<br>
+                Homem: 2.447 - (0.09156 × idade) + (0.1074 × altura) + (0.3362 × peso)
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="volumeDialisato">Volume Total Dialisato (L)</label>
+                    <input type="number" id="volumeDialisato" step="0.1" placeholder="Ou preencha os campos abaixo">
+                </div>
+                <div class="form-group">
+                    <label for="volumeInfusao">Volume Infusão/Ciclo (L) △</label>
+                    <input type="number" id="volumeInfusao" step="0.1" placeholder="Ex: 2.0">
+                </div>
+                <div class="form-group">
+                    <label for="numCiclos">Nº Ciclos △</label>
+                    <input type="number" id="numCiclos" step="1" placeholder="Ex: 4">
+                </div>
+                <div class="form-group">
+                    <label for="uf">UF (Ultrafiltração L) △</label>
+                    <input type="number" id="uf" step="0.1" placeholder="Ex: 0.5">
+                </div>
+                <div class="form-group">
+                    <label for="ureiaDialisato">Ureia Dialisato (mg/dL) *</label>
+                    <input type="number" id="ureiaDialisato" step="1" placeholder="Ex: 65">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Exames Laboratoriais</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="ureiaSangue">Ureia Sangue (mg/dL) *</label>
+                    <input type="number" id="ureiaSangue" step="1" placeholder="Ex: 187">
+                </div>
+                <div class="form-group">
+                    <label for="volumeUrina">Volume Urina 24h (L) *</label>
+                    <input type="number" id="volumeUrina" step="0.1" placeholder="Ex: 0.7">
+                </div>
+                <div class="form-group">
+                    <label for="ureia24h">Ureia Urina 24h (mg/dL) *</label>
+                    <input type="number" id="ureia24h" step="1" placeholder="Ex: 797">
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn btn-calculate" onclick="calcularKTV()">Calcular KTV</button>
+            <button class="btn btn-clear" onclick="limparCampos()">Limpar</button>
+            <button class="btn btn-print" onclick="imprimir()">Imprimir</button>
+        </div>
+
+        <div class="section results" id="resultados">
+            <div class="section-title">Resultados</div>
+            <div class="result-grid">
+                <div class="result-card">
+                    <div class="result-label">Volume Watson (L)</div>
+                    <div class="result-value" id="volWatson">-</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Volume Dialisato (L)</div>
+                    <div class="result-value" id="volDialisato">-</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">KTV Renal</div>
+                    <div class="result-value" id="ktvRenal">-</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">KTV Peritoneal</div>
+                    <div class="result-value" id="ktvPeritoneal">-</div>
+                </div>
+                <div class="result-card highlight">
+                    <div class="result-label">KTV TOTAL</div>
+                    <div class="result-value" id="ktvTotal">-</div>
+                </div>
+            </div>
+            <div class="warning" id="aviso">
+                <strong>Atenção:</strong> KTV abaixo do ideal (recomendado ≥ 1.7 para diálise peritoneal)
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calcularKTV() {
+            const sexo = document.getElementById('sexo').value;
+            const peso = parseFloat(document.getElementById('peso').value);
+            const altura = parseFloat(document.getElementById('altura').value);
+            const idade = parseFloat(document.getElementById('idade').value);
+            const volumeInfusao = parseFloat(document.getElementById('volumeInfusao').value);
+            const numCiclos = parseFloat(document.getElementById('numCiclos').value);
+            const uf = parseFloat(document.getElementById('uf').value);
+            const ureiaDialisato = parseFloat(document.getElementById('ureiaDialisato').value);
+            const ureiaSangue = parseFloat(document.getElementById('ureiaSangue').value);
+            const volumeUrina = parseFloat(document.getElementById('volumeUrina').value);
+            const ureia24h = parseFloat(document.getElementById('ureia24h').value);
+
+            let volWatson;
+            if (sexo === 'F') {
+                volWatson = (0.1069 * altura) + (0.2466 * peso) - 2.097;
+            } else {
+                volWatson = 2.447 - (0.09156 * idade) + (0.1074 * altura) + (0.3362 * peso);
+            }
+
+            let volDialisato;
+            if (document.getElementById('volumeDialisato').value !== '') {
+                volDialisato = parseFloat(document.getElementById('volumeDialisato').value);
+            } else {
+                volDialisato = (volumeInfusao * numCiclos) + uf;
+            }
+
+            const ktvRenal = (volumeUrina * ureia24h) / ureiaSangue / volWatson * 7;
+
+            const ktvPeritoneal = (volDialisato * ureiaDialisato) / ureiaSangue / volWatson * 7;
+
+            const ktvTotal = ktvRenal + ktvPeritoneal;
+
+            document.getElementById('volWatson').textContent = volWatson.toFixed(2);
+            document.getElementById('volDialisato').textContent = volDialisato.toFixed(2);
+            document.getElementById('ktvRenal').textContent = ktvRenal.toFixed(2);
+            document.getElementById('ktvPeritoneal').textContent = ktvPeritoneal.toFixed(2);
+            document.getElementById('ktvTotal').textContent = ktvTotal.toFixed(2);
+
+            const aviso = document.getElementById('aviso');
+            if (ktvTotal < 1.7) {
+                aviso.classList.add('show');
+            } else {
+                aviso.classList.remove('show');
+            }
+
+            document.getElementById('resultados').classList.add('show');
+            document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function limparCampos() {
+            document.querySelectorAll('input').forEach(input => input.value = '');
+            document.getElementById('sexo').value = 'F';
+            document.getElementById('resultados').classList.remove('show');
+            document.getElementById('aviso').classList.remove('show');
+        }
+
+        function imprimir() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
