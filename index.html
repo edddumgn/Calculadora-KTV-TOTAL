@@ -170,6 +170,23 @@
         .warning.show {
             display: block;
         }
+        .error-msg {
+            background: #e74c3c;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .error-msg.show {
+            display: block;
+        }
+        .input-error {
+            border-color: #e74c3c !important;
+            background-color: #fde8e8;
+        }
         .header-info {
             background: white;
             border-radius: 10px;
@@ -214,7 +231,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>Calculadora KTV</h1>
+        <img src="logo.png" alt="Nefroclínicas" style="max-width: 200px; display: block; margin: 0 auto 10px;">
+        <h1>Calculadora de KTV - Nefroclínicas</h1>
         <p class="subtitle">Cálculo de Kt/V para Diálise Peritoneal</p>
 
         <div class="header-info">
@@ -305,6 +323,8 @@
             </div>
         </div>
 
+        <div class="error-msg" id="errorMsg">Por favor, preencha todos os campos obrigatórios (*)</div>
+
         <div class="btn-container">
             <button class="btn btn-calculate" onclick="calcularKTV()">Calcular KTV</button>
             <button class="btn btn-clear" onclick="limparCampos()">Limpar</button>
@@ -343,10 +363,15 @@
 
     <script>
         function calcularKTV() {
+            document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+            document.getElementById('errorMsg').classList.remove('show');
+            document.getElementById('aviso').classList.remove('show');
+
             const sexo = document.getElementById('sexo').value;
             const peso = parseFloat(document.getElementById('peso').value);
             const altura = parseFloat(document.getElementById('altura').value);
             const idade = parseFloat(document.getElementById('idade').value);
+            const volumeDialisato = document.getElementById('volumeDialisato').value;
             const volumeInfusao = parseFloat(document.getElementById('volumeInfusao').value);
             const numCiclos = parseFloat(document.getElementById('numCiclos').value);
             const uf = parseFloat(document.getElementById('uf').value);
@@ -354,6 +379,29 @@
             const ureiaSangue = parseFloat(document.getElementById('ureiaSangue').value);
             const volumeUrina = parseFloat(document.getElementById('volumeUrina').value);
             const ureia24h = parseFloat(document.getElementById('ureia24h').value);
+
+            let camposFaltando = [];
+
+            if (!peso) camposFaltando.push('peso');
+            if (!altura) camposFaltando.push('altura');
+            if (!idade) camposFaltando.push('idade');
+            if (!ureiaSangue) camposFaltando.push('ureiaSangue');
+            if (!volumeUrina) camposFaltando.push('volumeUrina');
+            if (!ureia24h) camposFaltando.push('ureia24h');
+            if (!ureiaDialisato) camposFaltando.push('ureiaDialisato');
+
+            if (!volumeDialisato && (!volumeInfusao || !numCiclos || !uf)) {
+                camposFaltando.push('volumeDialisato', 'volumeInfusao', 'numCiclos', 'uf');
+            }
+
+            if (camposFaltando.length > 0) {
+                camposFaltando.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('input-error');
+                });
+                document.getElementById('errorMsg').classList.add('show');
+                return;
+            }
 
             let volWatson;
             if (sexo === 'F') {
@@ -381,11 +429,8 @@
             document.getElementById('ktvPeritoneal').textContent = ktvPeritoneal.toFixed(2);
             document.getElementById('ktvTotal').textContent = ktvTotal.toFixed(2);
 
-            const aviso = document.getElementById('aviso');
             if (ktvTotal < 1.7) {
-                aviso.classList.add('show');
-            } else {
-                aviso.classList.remove('show');
+                document.getElementById('aviso').classList.add('show');
             }
 
             document.getElementById('resultados').classList.add('show');
@@ -397,6 +442,8 @@
             document.getElementById('sexo').value = 'F';
             document.getElementById('resultados').classList.remove('show');
             document.getElementById('aviso').classList.remove('show');
+            document.getElementById('errorMsg').classList.remove('show');
+            document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
         }
 
         function imprimir() {
